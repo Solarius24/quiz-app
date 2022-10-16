@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from "react";
+import Questions from "./Questions";
 import ScoreCard from "./ScoreCard";
 import axios from "axios";
-import { NewQuestion } from "./NewQuestion";
-import "./App.css";
 
 const quizData = [
   {
     id: 1,
     title: "Which language runs in a web browser?",
-    answers: ["Java", "C", "Python", "JavaScript"],
+    answer: ["Java", "C", "Python", "JavaScript"],
     correct: "JavaScript",
   },
   {
     id: 2,
     title: "What does CSS stand for?",
-    answers: [
+    answer: [
       "Central Style Sheets",
       "Cascading Style Sheets",
       "Cascading Simple Sheets",
@@ -25,7 +24,7 @@ const quizData = [
   {
     id: 3,
     title: "What does HTML stand for?",
-    answers: [
+    answer: [
       "Hypertext Markup Language",
       "Hypertext Markdown Language",
       "Hyperloop Machine Language",
@@ -36,42 +35,45 @@ const quizData = [
   {
     id: 4,
     title: "What year was JavaScript launched?",
-    answers: ["1996", "1995", "1994", "none of the above"],
+    answer: ["1996", "1995", "1994", "none of the above"],
     correct: "1995",
   },
 ];
 
 const App = () => {
-  const [question, setQuestion] = useState(0);
+  const [counter, setCounter] = useState(0);
   const [display, setDisplay] = useState({ display: "none" });
   const [displayQ, setDisplayQ] = useState({ display: "" });
-
+  const [userScore, setUserScore] = useState("");
   const [value, setValue] = useState(0);
-  const [userAnswer, setUserAnswer] = useState("");
+  const [userAnswer, setUserAnswer] = useState([]);
 
-  // useEffect(() => {
-  //   const dataFetch = async () => {
-  //     const data = await axios.get(
-  //       "https://opentdb.com/api.php?amount=10&type=multiple"
-  //     );
+  console.log("parent userAnswer", userAnswer);
 
-  //     return data;
-  //   };
-  //   dataFetch();
-  // }, []);
+  useEffect(() => {
+    const dataFetch = async () => {
+      const data = await axios.get(
+        "https://opentdb.com/api.php?amount=10&type=multiple"
+      );
+
+      return data;
+    };
+    dataFetch();
+  }, []);
 
   const counterHandler = () => {
-    if (question < 3) {
-      setQuestion(question + 1);
-    } else if (question >= 3) {
+    if (counter < 3) {
+      setCounter(counter + 1);
+    } else if (counter >= 3) {
       setDisplayQ({ display: "none" });
       setDisplay({ display: "flex" });
     }
   };
 
   const finalScore = () => {
-    if (userAnswer === quizData[question].correct) {
-      setValue(value + 25);
+    let final = 0;
+    if (userScore === quizData[counter].correct) {
+      setValue(final + 25);
     }
   };
 
@@ -81,20 +83,21 @@ const App = () => {
   };
 
   return (
-    <React.Fragment>
+    <div>
       <ScoreCard display={display} value={value} />
       <div className="quiz-container">
-        <h2>{question + 1}/4</h2>
-        <NewQuestion
-          data={quizData[question]}
+        <h2>{counter + 1}/4</h2>
+        <Questions
           display={displayQ}
+          questions={quizData}
+          score={(userScore) => setUserScore(userScore)}
           setUserAnswer={setUserAnswer}
         />
         <button onClick={click} style={displayQ}>
           Submit
         </button>
       </div>
-    </React.Fragment>
+    </div>
   );
 };
 
